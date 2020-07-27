@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Chat</title>
+        <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    </head>
+    <body>
+
+        <div class="container p-3">
+            <h5 class="card-title">Simple Chat</h5>
+
+            <div class="card border-secondary">
+                <div class="card-body" id="log"></div>
+            </div>
+
+            <br>
+            <div class="form-group">
+                <input type="text" name="message" id="message" class="form-control">
+            </div>
+
+            <div align="center">
+                <button type="submit" name="send" id="send" class="btn btn-outline-dark">Send</button>
+            </div>
+        </div>
+
+        <script>
+
+            const websocket = new WebSocket("ws://127.0.0.1:6789/");
+
+            const message = document.getElementById("message");
+
+            document.getElementById("message").onkeyup = function(e){
+
+                if (e.keyCode === 13) {
+
+                    document.getElementById("send").click();
+                }
+            }
+
+            document.getElementById("send").onclick = function(e) {
+
+                websocket.send(JSON.stringify({"message": message.value}));
+
+                message.value = "";
+            }
+
+            websocket.onmessage = function(e) {
+
+                const data = JSON.parse(e.data);
+
+                const time = document.createElement("p");
+
+                const message = document.createElement("p");
+
+                if (data.message) {
+
+                    time.innerHTML = data.time;
+
+                    message.innerHTML = data.message;
+
+                    time.setAttribute("class", "text-muted");
+
+                    message.setAttribute("class", "text-dark");
+
+                    document.getElementById("log").appendChild(message);
+
+                    document.getElementById("log").appendChild(time);
+
+                }
+
+            }
+
+        </script>
+    </body>
+</html>
